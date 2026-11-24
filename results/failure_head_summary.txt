@@ -1,0 +1,20 @@
+DINOv3 FAILURE HEADS (original recipe; validation numbers are for monitoring only)
+==========================================================================
+
+Classifier seed 42: validation failures 0/1001
+  MSP (no training)      AUPRC nan  AUROC nan
+  proposed               AUPRC nan  AUROC nan  (inputs 387, params 24,897, train failures 15, pos weight 5)
+  features_only          AUPRC nan  AUROC nan  (inputs 384, params 24,705, train failures 15, pos weight 5)
+  logits_only            AUPRC nan  AUROC nan  (inputs 3, params 321, train failures 15, pos weight 5)
+
+Classifier seed 123: validation failures 0/1001
+  MSP (no training)      AUPRC nan  AUROC nan
+  proposed               AUPRC nan  AUROC nan  (inputs 387, params 24,897, train failures 11, pos weight 5)
+  features_only          AUPRC nan  AUROC nan  (inputs 384, params 24,705, train failures 11, pos weight 5)
+  logits_only            AUPRC nan  AUROC nan  (inputs 3, params 321, train failures 11, pos weight 5)
+
+Classifier seed 2026: validation failures 0/1001
+  MSP (no training)      AUPRC nan  AUROC nan
+  proposed               AUPRC nan  AUROC nan  (inputs 387, params 24,897, train failures 11, pos weight 5)
+  features_only          AUPRC nan  AUROC nan  (inputs 384, params 24,705, train failures 11, pos weight 5)
+  logits_only            AUPRC nan  AUROC nan  (inputs 3, params 321, train failures 11, pos weight 5)

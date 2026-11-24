@@ -44,6 +44,11 @@ VARIANTS = ("proposed", "features_only", "logits_only")
 SUMMARY_FILE = RESULTS_DIR / "failure_head_summary.txt"
 
 
+def defined(function, y, scores):
+    """Monitoring metric, or NaN when the validation views contain only one class (e.g. no failures)."""
+    return float(function(y, scores)) if 0 < y.sum() < len(y) else float("nan")
+
+
 def head_matrix(variant, arrays):
     if variant == "proposed":
         return np.concatenate([arrays["features"], arrays["logits"]], axis=1).astype(np.float32)
@@ -95,8 +100,8 @@ def train_head(variant, arrays, seed, device):
             val_loss = float(criterion(val_logits, y_val_tensor).item())
             val_scores = torch.sigmoid(val_logits).cpu().numpy()
         history.append({"epoch": epoch, "train_loss": total / seen, "validation_loss": val_loss,
-                        "validation_auprc_error": float(average_precision_score(y_val_int, val_scores)),
-                        "validation_auroc_error": float(roc_auc_score(y_val_int, val_scores))})
+                        "validation_auprc_error": defined(average_precision_score, y_val_int, val_scores),
+                        "validation_auroc_error": defined(roc_auc_score, y_val_int, val_scores)})
     checkpoint = {
         "state_dict": {k: v.detach().cpu() for k, v in model.state_dict().items()},
         "input_mean": torch.from_numpy(mean), "input_std": torch.from_numpy(std),
@@ -149,8 +154,8 @@ def main():
         msp = untrained_scores(arrays["logits"][val_mask])["MSP"]
         y_val = arrays["failure_label"][val_mask].astype(np.int64)
         lines.append(f"Classifier seed {seed}: validation failures {int(y_val.sum())}/{len(y_val)}")
-        lines.append(f"  {'MSP (no training)':<22} AUPRC {average_precision_score(y_val, msp):.3f}  "
-                     f"AUROC {roc_auc_score(y_val, msp):.3f}")
+        lines.append(f"  {'MSP (no training)':<22} AUPRC {defined(average_precision_score, y_val, msp):.3f}  "
+                     f"AUROC {defined(roc_auc_score, y_val, msp):.3f}")
         for variant in VARIANTS:
             checkpoint, history, scores, _, positives = train_head(variant, arrays, seed, device)
             torch.save(checkpoint, MODELS_DIR / f"failure_head_{variant}_seed{seed}.pt")
