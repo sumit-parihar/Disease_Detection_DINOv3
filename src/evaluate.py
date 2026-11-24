@@ -36,7 +36,7 @@ from metrics import (auprc_error, aurc, auroc_error, calibration_summary,   # no
                      classification_summary, risk_coverage_curve, selective_risk_at)
 
 PREREG = ROOT / "prereg" / "dinov3_preregistration.md"
-PREREG_SHA = "TO BE SET AFTER SEALING"
+PREREG_SHA = "2e6b58847aad4ea1aef2344cc1759078108d36f33721d9f200be42391f72a9cf"
 CLASSES = ["healthy", "scab", "rust"]
 DATASETS = ("s_test", "pp2020", "plantdoc")
 TARGETS = ("pp2020", "plantdoc")

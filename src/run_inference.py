@@ -42,7 +42,7 @@ from frozen_pipeline import run_images   # noqa: E402
 from run_target_inference import build_table   # noqa: E402
 
 PREREG = ROOT / "prereg" / "dinov3_preregistration.md"
-PREREG_SHA = "TO BE SET AFTER SEALING"
+PREREG_SHA = "2e6b58847aad4ea1aef2344cc1759078108d36f33721d9f200be42391f72a9cf"
 BATCH = 32
 OUT = RESULTS_DIR / "inference"
 DATASETS = {
