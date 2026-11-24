@@ -1,0 +1,37 @@
+backbone,dataset,seed,batch_size,S2_alarm_rate,status
+MobileNetV3-Small,PP2020,42,20,1.0,exploratory
+MobileNetV3-Small,S-test,42,20,0.0085,exploratory (false alarms)
+MobileNetV3-Small,PP2020,42,50,1.0,exploratory
+MobileNetV3-Small,S-test,42,50,0.011,exploratory (false alarms)
+MobileNetV3-Small,PP2020,123,20,1.0,exploratory
+MobileNetV3-Small,S-test,123,20,0.012,exploratory (false alarms)
+MobileNetV3-Small,PP2020,123,50,1.0,exploratory
+MobileNetV3-Small,S-test,123,50,0.0065,exploratory (false alarms)
+MobileNetV3-Small,PP2020,2026,20,1.0,exploratory
+MobileNetV3-Small,S-test,2026,20,0.0115,exploratory (false alarms)
+MobileNetV3-Small,PP2020,2026,50,1.0,exploratory
+MobileNetV3-Small,S-test,2026,50,0.014,exploratory (false alarms)
+MobileNetV3-Small,PlantDoc,42,20,0.9995,pre-registered
+MobileNetV3-Small,PlantDoc,42,50,1.0,pre-registered
+MobileNetV3-Small,PlantDoc,123,20,0.9995,pre-registered
+MobileNetV3-Small,PlantDoc,123,50,1.0,pre-registered
+MobileNetV3-Small,PlantDoc,2026,20,0.9975,pre-registered
+MobileNetV3-Small,PlantDoc,2026,50,1.0,pre-registered
+DINOv3 ViT-S/16,S-test,42,20,0.01,false alarms
+DINOv3 ViT-S/16,S-test,42,50,0.011,false alarms
+DINOv3 ViT-S/16,S-test,123,20,0.007,false alarms
+DINOv3 ViT-S/16,S-test,123,50,0.013,false alarms
+DINOv3 ViT-S/16,S-test,2026,20,0.0055,false alarms
+DINOv3 ViT-S/16,S-test,2026,50,0.0095,false alarms
+DINOv3 ViT-S/16,PP2020,42,20,0.9945,pre-registered
+DINOv3 ViT-S/16,PP2020,42,50,1.0,pre-registered
+DINOv3 ViT-S/16,PP2020,123,20,0.9985,pre-registered
+DINOv3 ViT-S/16,PP2020,123,50,1.0,pre-registered
+DINOv3 ViT-S/16,PP2020,2026,20,0.9955,pre-registered
+DINOv3 ViT-S/16,PP2020,2026,50,1.0,pre-registered
+DINOv3 ViT-S/16,PlantDoc,42,20,0.967,pre-registered
+DINOv3 ViT-S/16,PlantDoc,42,50,1.0,pre-registered
+DINOv3 ViT-S/16,PlantDoc,123,20,0.945,pre-registered
+DINOv3 ViT-S/16,PlantDoc,123,50,1.0,pre-registered
+DINOv3 ViT-S/16,PlantDoc,2026,20,0.9425,pre-registered
+DINOv3 ViT-S/16,PlantDoc,2026,50,1.0,pre-registered

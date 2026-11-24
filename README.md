@@ -1,0 +1,299 @@
+# Disease_Detection_DINOv3
+
+**A pre-registered backbone replication: the apple-leaf failure-prediction recipe rerun with a self-supervised foundation model (DINOv3 ViT-S/16) in place of MobileNetV3-Small, then tested once on lab images (S-test) and two independent field datasets (PP2020, PlantDoc).**
+
+This is the third repository of one study:
+
+| Repository | What it does |
+|---|---|
+| `Disease_Detection_` (original) | MobileNetV3-Small trained on PlantVillage apple (lab); failure heads trained on synthetic degradations of lab images; frozen; tested once on S-test and PP2020 (field). |
+| `Disease_Detection_extended` | The same frozen MobileNet system, tested once (pre-registered) on PlantDoc, a second field dataset; plus exploratory analyses. |
+| **`Disease_Detection_DINOv3` (this one)** | **The same recipe, with only the backbone changed to DINOv3; tested once (pre-registered) on S-test, PP2020 and PlantDoc.** |
+
+> **The original and extended projects are only read.** Every image list, split file and label manifest taken from them is verified by SHA-256. The training recipe is not re-written: the original code is imported read-only and run unchanged.
+
+---
+
+## Contents
+
+1. [The question](#1-the-question)
+2. [The experiments of the whole study, in short](#2-the-experiments-of-the-whole-study-in-short)
+3. [Protocol and safeguards](#3-protocol-and-safeguards)
+4. [Experiment log, step by step](#4-experiment-log-step-by-step)
+5. [Source-side results (before any field image was seen)](#5-source-side-results-before-any-field-image-was-seen)
+6. [Results: confirmatory (pre-registered)](#6-results-confirmatory-pre-registered)
+7. [Results: descriptive and exploratory](#7-results-descriptive-and-exploratory)
+8. [Combined results of the three repositories](#8-combined-results-of-the-three-repositories)
+9. [What the combined study supports](#9-what-the-combined-study-supports)
+10. [Limitations](#10-limitations)
+11. [Repository layout](#11-repository-layout)
+12. [How to reproduce](#12-how-to-reproduce)
+13. [Figure data](#13-figure-data)
+14. [Provenance, licences and hashes](#14-provenance-licences-and-hashes)
+
+---
+
+## 1. The question
+
+The original study concluded the following:
+1. Failure heads trained only on synthetic degradations of lab images (P1: image features + logits; A1: features only) do not rank field errors better than the classifier's own confidence (MSP).
+2. A temperature fitted on lab data does not transfer to the field.
+3. A logits-only head (B5) beat MSP on PP2020. The extended study showed this happens only when the classifier collapses into one class.
+4. A source-only batch alarm flags field data.
+
+Were these findings caused by a small, weak CNN? Or do they hold for a modern self-supervised vision foundation model that is far more robust? **This repository changes only the backbone and tests all four findings again, with hypotheses fixed in advance.**
+
+**Why DINOv3:**
+- It is the newest self-supervised vision foundation model (Meta, August 2025), with little published work on plant-disease reliability.
+- Its smallest variant (ViT-S/16, 21.6M parameters) trains in full precision on a 4 GB laptop GPU (peak 0.76 GB).
+- Its official weights are available without gating through the `timm` library (`notes/plan.md`, amendment 1).
+
+## 2. The experiments of the whole study, in short
+
+| | Backbone | Trained on | Tested once on |
+|---|---|---|---|
+| **E1** original | MobileNetV3-Small (0.93M) | PlantVillage apple, 2,550 lab images (healthy / scab / rust), fixed split; failure heads on 13 synthetic views per S-reliability image | S-test (lab, 382) and **PP2020** (field, 1,730) |
+| **E2** extended | the same frozen MobileNet | (no training) | **PlantDoc** (web/field, 265) |
+| **E3** this repo | **DINOv3 ViT-S/16 (21.6M)** | the same split, the same views, the same recipe and code | S-test, **PP2020** and **PlantDoc** |
+
+All three use seeds 42, 123 and 2026. Each runs the seven reliability scores below:
+- B1 MSP, B2 entropy, B3 margin, B4 temperature-scaled MSP;
+- B5 logits-only head, A1 features-only head, P1 proposed head;
+- E2 and E3 also report the energy score E = −log Σ exp(logits).
+
+**ΔAURC** = AURC(score) − AURC(MSP); below 0 means better than MSP.
+
+## 3. Protocol and safeguards
+
+| Safeguard | How it is done here |
+|---|---|
+| Plan before any check | `notes/plan.md` (commit `cf9362f`) fixed the backbone, a fallback rule (DINOv2-small), the recipe mapping and the memory rules before access, loading or training. Amendment 1 (`3f6f8e4`) switched to the ungated `timm` weights before any load. |
+| Same recipe | The original `train_classifier.py` (training loop, early stopping, class weights), `dataset.py` (split, transforms, seeded loader), `prepare_reliability_data_v2.py` (views), `failure_head_diagnostic.py` (head design), `frozen_pipeline.run_images`, `calibrate_and_thresholds.py` and `metrics.py` are imported read-only. |
+| Same views | The 13 views per image are regenerated by the original code and must be **byte-identical** to the original view manifest (SHA `3473bdb0…`). They are. |
+| Same head loop | Retraining the original seed-42 heads with this loop reproduces A1 and B5 **bit-for-bit**. P1 matches up to a small numerical difference because its checkpoint was made with an older PyTorch on CPU; its validation numbers agree (`notes/head_recipe_check.md`). |
+| Freeze | `results/frozen_system_manifest.json`: 39 files (classifiers, heads, calibration, thresholds, code, the original code used, the split, the backbone weights), commit `8e7bb90`, SHA `f357f7f2…4577`. It is verified before inference and before evaluation. |
+| Pre-registration | `prereg/dinov3_preregistration.md`, sealed at SHA `2e6b5884…a9cf` (commit `1b4a306`). The scripts refuse to run if it changes. |
+| No label before predictions | Inference reads only label-free lists. The predictions were hashed, committed and pushed (`e35b7e2`) before the labels were joined. |
+| Run once | Inference and evaluation refuse to run again if outputs exist. A random-label dry run (real labels not read) tested the evaluation code first. |
+
+## 4. Experiment log, step by step
+
+| # | Step | Commit | Outcome |
+|---|---|---|---|
+| 1 | Plan (backbone, fallback, recipe mapping, memory rules) | `cf9362f` | Fixed before any check |
+| 2 | Amendment 1: official DINOv3 weights from the ungated `timm` mirror | `3f6f8e4` | No gated access needed |
+| 3 | Backbone check: load, revision and weight hash, RoPE periods truncated to bfloat16 (as in the original model), 4 GB fit test | `326bc9d` | fp32, batch 32, peak 0.72 GB. The fallback was not needed. |
+| 4 | Training script (original code imported) | `f84b8f8` | — |
+| 5 | Head-loop reproduction check | `731fe86` | A1/B5 bit-identical, P1 equivalent |
+| 6 | Classifiers, 3 seeds | `7a2574b` | Val macro-F1 1.00 for every seed |
+| 7 | Views, heads, calibration, alarm thresholds (source only) | `8e7bb90` | Few synthetic failures; temperature at its search limit (section 5) |
+| 8 | Freeze (39 files) + draft pre-registration | `1fece3f` | — |
+| 9 | Pre-registration sealed | `1b4a306` | — |
+| 10 | One-time inference; predictions pushed before labels | `e35b7e2` | Label-free collapse index: PP2020 0.68, PlantDoc 0.47 |
+| 11 | One-time evaluation | `c1b711d` | Section 6 |
+| 12 | Figure data, this README | — | Section 13 |
+
+## 5. Source-side results (before any field image was seen)
+
+**Classifiers** (`results/dino_seed*_run_record.json`):
+
+| Seed | Phase A best epoch (of 12) | Phase B best epoch (stopped) | Val macro-F1 |
+|---|---|---|---|
+| 42 | 12 | 3 (8) | 1.000 |
+| 123 | 12 | 1 (6) | 1.000 |
+| 2026 | 12 | 1 (6) | 1.000 |
+
+**Synthetic failures almost disappear** (`results/reliability_generation_summary.txt`, figure data G3):
+
+| | MobileNetV3-Small | DINOv3 ViT-S/16 |
+|---|---|---|
+| Failing reliability-training views (of 3,978) | 95 / 77 / 74 | **15 / 11 / 11** |
+| Original images behind them | 24 / 20 / 21 | **2 / 3 / 3** |
+| Failing reliability-validation views (of 1,001) | 22 / 22 / 23 | **0 / 0 / 0** |
+
+- The pre-set minimum of 50 failing training views is not met. As the plan requires, the views were **not** changed. The heads were trained on these few positives, and their source validation quality cannot be measured: AUPRC/AUROC are undefined with no failures, and are recorded as NaN.
+- **S-calibration** holds 0, 1 and 0 wrong predictions. The original temperature search therefore stops at or near its lower limit: **T = 0.050, 0.114 and 0.050**. This sharpens the logits by up to 20 times. All of this was disclosed in the pre-registration before any field output existed.
+- **Batch-alarm thresholds** (`results/source_alarm_thresholds.csv`) are the 99th percentile of the S2 statistic over 2,000 random batches of reliability-training original images. False alarms on held-out source originals are 0.0–0.7%.
+
+## 6. Results: confirmatory (pre-registered)
+
+Full output: `results/evaluation/summary.txt`. Intervals are 95% intervals from 2,000 cluster resamples, with seeds resampled jointly. No seed is underpowered: there are 592–648 errors on PP2020 and 76–85 on PlantDoc.
+
+| ID | Hypothesis | PP2020 | PlantDoc |
+|---|---|---|---|
+| **H1 (primary)** | P1 does not beat MSP | **Supported:** +0.017 [+0.005, +0.030]. **P1 is worse than MSP.** | **Supported:** +0.082 [+0.036, +0.128]. **P1 is worse.** |
+| H2 | A1 does not beat MSP | Supported: +0.020 [+0.007, +0.033] (worse) | Supported: +0.087 [+0.039, +0.134] (worse) |
+| H3 | B5 beats MSP only under collapse (C ≥ 0.90) | Supported: C = 0.676, no collapse; B5 +0.009 [−0.005, +0.024], no gain | Supported: C = 0.465, no collapse; B5 +0.089 [+0.039, +0.139], worse |
+| H4 | Source temperature does not improve field NLL | Supported: 0.894 → 11.010 | Supported: 0.747 → 8.816 |
+| H5 | S2 alarm fires on ≥ 95% of batches (sizes 20 and 50, every seed) | Supported: lowest rate 0.994 | **Not supported:** batch 20 gives 0.967 / 0.945 / 0.942; batch 50 gives 1.000 |
+| H6 | B5 follows logit magnitude rather than the gap | **Contradicted:** −0.090 [−0.133, −0.049] | Supported: +0.372 [+0.279, +0.460] |
+
+Notes:
+- H5 and H6 use no labels. Their values were fixed when the predictions were pushed, and the random-label dry run shows them unchanged.
+- H4 was expected, given the degenerate temperature disclosed in advance.
+
+## 7. Results: descriptive and exploratory
+
+**Classification:**
+
+| Set | Accuracy (seeds 42 / 123 / 2026) | Macro-F1 | Most-predicted class (share) |
+|---|---|---|---|
+| S-test | 1.000 / 1.000 / 1.000 | 1.000 | healthy (0.647, the true class mix) |
+| PP2020 | 0.658 / 0.625 / 0.639 | 0.61–0.65 | scab (0.66–0.70) |
+| PlantDoc | 0.687 / 0.713 / 0.679 | 0.68–0.71 | scab (0.45–0.49) |
+
+**PP2020 confusion matrix, seed 42** (rows are the true class):
+
+| | healthy | scab | rust |
+|---|---|---|---|
+| healthy | 230 | 283 | 3 |
+| scab | 7 | 584 | 1 |
+| rust | 27 | 271 | 324 |
+
+Field errors are still mostly "called scab", but far less extreme than MobileNet's 98%.
+
+**All scores, seed means** (ΔAURC vs MSP [95% interval]; `results/evaluation/seed_mean.csv`):
+
+| Score | PP2020 | PlantDoc |
+|---|---|---|
+| B2 Entropy | −0.002 [−0.004, −0.001] | −0.003 [−0.007, −0.000] |
+| B3 Margin | +0.002 [+0.001, +0.002] | +0.001 [−0.001, +0.004] |
+| B4 Temp-scaled MSP | +0.056 [+0.050, +0.063] | +0.040 [+0.023, +0.057] |
+| B5 Logits-only head | +0.009 [−0.005, +0.024] | +0.089 [+0.039, +0.139] |
+| A1 Features-only head | +0.020 [+0.007, +0.033] | +0.087 [+0.039, +0.134] |
+| P1 Proposed head | +0.017 [+0.005, +0.030] | +0.082 [+0.036, +0.128] |
+| E Energy | +0.010 [+0.002, +0.018] | +0.006 [−0.014, +0.025] |
+
+Plain MSP and entropy are the best scores on both field sets.
+
+**Frozen cut-offs do not transfer:**
+- The tau80 cut-off of MSP answers only 10.5% of PP2020 images and 9.2% of PlantDoc images, against the 80% intended.
+- The cut-offs of the trained heads and of temperature-scaled MSP answer 13–47%.
+
+**Exploratory** (not pre-registered as hypotheses):
+- **Logit magnitude:** the median log-sum-exp is lower for wrong predictions (PP2020 2.15 vs 2.84 correct; PlantDoc 2.03 vs 3.01), as with MobileNet.
+- **AUROC decomposition** (figure data G7): on PP2020, MSP ranks errors well *within* each predicted class (weighted within-class AUROC 0.85), and the trained heads do not add to this.
+
+## 8. Combined results of the three repositories
+
+| | MobileNet, PP2020 (E1) | MobileNet, PlantDoc (E2) | DINOv3, PP2020 (E3) | DINOv3, PlantDoc (E3) |
+|---|---|---|---|---|
+| Lab accuracy (S-test) | 99.7% | (same system) | 100% | (same system) |
+| Field accuracy | 35.7% | 47.4% | **64.1%** | **69.3%** |
+| Collapse index (seed mean) | **0.984** | 0.688 | 0.676 | 0.465 |
+| P1 vs MSP | +0.029 [−0.002, +0.058] not better | +0.077 [+0.006, +0.145] **worse** | +0.017 [+0.005, +0.030] **worse** | +0.082 [+0.036, +0.128] **worse** |
+| A1 vs MSP | +0.049 **worse** | +0.090 **worse** | +0.020 **worse** | +0.087 **worse** |
+| B5 vs MSP | **−0.099 [−0.120, −0.078] better** | +0.027 [−0.034, +0.085] no gain | +0.009 [−0.005, +0.024] no gain | +0.089 **worse** |
+| Field NLL, before → after source temperature | 2.96 → 6.62 | 1.84 → 3.79 | 0.89 → 11.01 | 0.75 → 8.82 |
+| S2 batch-alarm rate | 100% (exploratory) | 99.8–100% | 99.4–100% | 94.2–100% |
+| Synthetic training failures for the heads | 74–95 | (same heads) | 11–15 | (same heads) |
+
+The MobileNet PP2020 intervals come from the original evaluation (`np.unique` cluster order). Every other interval uses the extended study's resampling code. Both use 2,000 cluster resamples with seed 2026.
+
+## 9. What the combined study supports
+
+1. **Source-only failure heads do not transfer to real field shift.**
+   - Heads trained on synthetic degradations of lab images (P1, A1) never beat MSP in any of the 4 backbone × field-dataset tests.
+   - They are significantly worse in 3 of the 4 for P1, and in all 4 for A1.
+   - This holds for a 0.9M-parameter CNN and for a 21.6M-parameter self-supervised foundation model, on two independent field datasets.
+2. **A stronger backbone makes source-only failure supervision scarcer, not better.**
+   - DINOv3 is nearly immune to the synthetic corruptions: 11–15 failing views from 2–3 images, against 74–95 for MobileNet.
+   - It still makes 30–36% errors in the field. Synthetic failures and real field failures are different things, and better backbones widen that gap.
+3. **An apparent win can be a regime artefact.**
+   - The logits-only head's large gain appeared only where the classifier collapsed into one class (MobileNet on PP2020).
+   - A label-free regime rule was pre-registered, and it correctly predicted "no gain" for DINOv3 on both field datasets.
+   - Single-dataset reliability claims can therefore mislead.
+4. **Source calibration harms field calibration.** The source-fitted temperature raised field NLL in all 4 tests (2 to 12 times). The source-fitted 80% cut-offs answered only about 10% of field images.
+5. **A simple label-free safeguard works.** A batch alarm on predicted-class proportions flags field batches in almost every case (the only miss is 94–97% at batch size 20 on PlantDoc), with about 1% false alarms on lab data.
+6. **Method.** The work uses:
+   - pre-registration;
+   - hash-frozen systems;
+   - predictions pushed before labels were joined;
+   - reuse of the original code verified bit-for-bit;
+   - full reporting of failed hypotheses (DINOv3 H5 on PlantDoc, H6 on PP2020).
+
+**Not supported:** the mechanism "B5 tracks logit magnitude rather than the gap" holds on PlantDoc but reverses on DINOv3 + PP2020. It should be presented as dataset-dependent.
+
+## 10. Limitations
+
+- **One new backbone.** "Foundation models" in general are represented by a single small DINOv3 variant.
+- **Few failure examples.** The DINOv3 heads were trained on 11–15 positive views from 2–3 images, below the pre-set minimum of 50. This is itself a finding (section 9, point 2), but it means the DINOv3 heads are weakly trained by construction.
+- **Degenerate calibration set.** S-calibration has 0–1 errors, so the temperature sits at its search limit. H4 was therefore expected.
+- **Small PlantDoc.** It has 265 images, and its labels are web-sourced (8 images were excluded by a visual check in the extended study).
+- **Same split.** The lab split, view definitions and severity were inherited unchanged. Other corruption types or severities were not explored, deliberately.
+- **Shared resamples.** The MobileNet PP2020 intervals come from the original evaluation code; the order of the cluster resampling differs slightly from the code used elsewhere.
+
+## 11. Repository layout
+
+```
+notes/plan.md                      plan + amendment 1 (fixed before any check)
+notes/head_recipe_check.md         reproduction of the original heads with this loop
+prereg/dinov3_preregistration.md   sealed pre-registration
+src/common.py                      paths, DINOv3 classifier, read-only link to the original code
+src/check_backbone.py              load test, weight hash, 4 GB fit test
+src/train_classifier.py            3 seeds, original recipe
+src/prepare_reliability_views.py   13 views per image (checked identical to the original), features/logits
+src/train_failure_heads.py         P1 / A1 / B5 (+ --check-original)
+src/calibrate.py                   S-calibration outputs, temperature, tau80/tau90 (original code)
+src/source_alarm_thresholds.py     S1/S2 batch-alarm thresholds from source only
+src/freeze.py                      freeze record / --verify
+src/run_inference.py               one-time label-free inference (S-test, PP2020, PlantDoc)
+src/evaluate.py                    one-time evaluation (+ --dry-run-random-labels)
+src/prepare_figure_data.py         figure_data/G1-G7
+results/                           run records, logs, calibration, thresholds, freeze record
+results/inference/                 label-free predictions (pushed before labels) + hashes
+results/evaluation/                evaluation tables + summary.txt + hashes
+figure_data/                       tables behind the figures
+```
+
+`models/`, `hf_cache/`, `venv/`, `logs/` and `*.npz` files are not tracked.
+
+## 12. How to reproduce
+
+Requirements: Windows or Linux, an NVIDIA GPU with at least 4 GB, the original project at `D:\Capstone Project\Capstone Project` and the extended project at `D:\capstone-paper-extended` (paths are set in `src/common.py`).
+
+```
+python -m venv venv
+venv/Scripts/pip install -r requirements_frozen.txt      # torch 2.11.0+cu128, timm 1.0.31, ...
+cd src
+../venv/Scripts/python check_backbone.py                  # downloads the weights into hf_cache/
+../venv/Scripts/python train_classifier.py --seed 42      # then 123, 2026
+../venv/Scripts/python prepare_reliability_views.py
+../venv/Scripts/python train_failure_heads.py
+../venv/Scripts/python calibrate.py
+../venv/Scripts/python source_alarm_thresholds.py
+../venv/Scripts/python freeze.py
+../venv/Scripts/python run_inference.py                   # once; push predictions before the next step
+../venv/Scripts/python evaluate.py                        # once
+../venv/Scripts/python prepare_figure_data.py
+```
+
+The one-time scripts refuse to run when their outputs exist. A rerun from scratch therefore needs a fresh clone, and on a different GPU or library version it will reproduce the numbers closely rather than bit-for-bit.
+
+## 13. Figure data
+
+`figure_data/`, made by `src/prepare_figure_data.py` from saved outputs only:
+
+| File | Suggested figure |
+|---|---|
+| `G1_cross_study_delta_aurc.csv` | Forest plot: ΔAURC vs MSP with 95% intervals for every score, 2 backbones × 2 field datasets (the main figure) |
+| `G2_accuracy_collapse.csv` | Bars: lab vs field accuracy per backbone, with the collapse index marked (C = 0.90 line) |
+| `G3_synthetic_view_failures.csv` | Bars: failing synthetic views per view type, MobileNet vs DINOv3 ("the supervision disappears") |
+| `G4_calibration.csv` | Paired dots: field NLL before and after the source temperature |
+| `G5_batch_alarm.csv` | Alarm rate per dataset, batch size and backbone, with the 95% line and lab false alarms |
+| `G6_risk_coverage_dinov3.csv` | Risk-coverage curves on PP2020 and PlantDoc (MSP, B4, B5, A1, P1) |
+| `G7_auroc_decomposition.csv` | Overall, between-class and within-class AUROC-error per score: explains the collapse regime |
+
+MobileNet-only figure data (PlantDoc curves, reliability diagrams, regimes) is in the extended repository, `figure_data/F1–F7`.
+
+## 14. Provenance, licences and hashes
+
+- **DINOv3 weights:** `timm/vit_small_patch16_dinov3.lvd1689m`, revision `3bf4720a82ec2066db88137180ff1f83a675cef0`, `model.safetensors` SHA-256 `2a1ec16ae28ffa07bc0ead0241ee7df9fc26451fe6f9f839b7b3afa0a906b040`. They are under the **DINOv3 License** (Meta). Publications must acknowledge DINOv3, and any redistribution of the weights must include the licence; the weights are not redistributed here. Cite: Siméoni et al., *DINOv3*, arXiv:2508.10104 (2025).
+- **PlantVillage:** used through the original project's split (SHA `d59a80cc…6a401`).
+- **PP2020:** Plant Pathology 2020 (FGVC7). The label-free list is `target_inference_manifest.csv`, SHA `69dc708e…29cac`.
+- **PlantDoc:** Singh et al., CoDS-COMAD 2020, CC BY 4.0. The label-free list is `plantdoc_inference_manifest.csv`, SHA `66c43f19…e149`.
+- **Key hashes:**
+  - freeze record `f357f7f29e6489e66c27519e547316ca4d33314d1b9c1e5377f5e53fc5b54577`;
+  - pre-registration `2e6b58847aad4ea1aef2344cc1759078108d36f33721d9f200be42391f72a9cf`;
+  - inference outputs: `results/inference/inference_hashes.txt`;
+  - evaluation outputs: `results/evaluation/evaluation_hashes.txt`.

@@ -1,0 +1,61 @@
+backbone,seed,reliability_split,view_type,failing_views,views
+MobileNetV3-Small,42,reliability_train,brightness,16,918
+MobileNetV3-Small,42,reliability_train,contrast,18,918
+MobileNetV3-Small,42,reliability_train,gaussian_blur,39,918
+MobileNetV3-Small,42,reliability_train,gaussian_noise,17,918
+MobileNetV3-Small,42,reliability_train,original,5,306
+MobileNetV3-Small,42,reliability_val,brightness,3,231
+MobileNetV3-Small,42,reliability_val,contrast,3,231
+MobileNetV3-Small,42,reliability_val,gaussian_blur,12,231
+MobileNetV3-Small,42,reliability_val,gaussian_noise,3,231
+MobileNetV3-Small,42,reliability_val,original,1,77
+MobileNetV3-Small,123,reliability_train,brightness,13,918
+MobileNetV3-Small,123,reliability_train,contrast,13,918
+MobileNetV3-Small,123,reliability_train,gaussian_blur,34,918
+MobileNetV3-Small,123,reliability_train,gaussian_noise,12,918
+MobileNetV3-Small,123,reliability_train,original,5,306
+MobileNetV3-Small,123,reliability_val,brightness,3,231
+MobileNetV3-Small,123,reliability_val,contrast,3,231
+MobileNetV3-Small,123,reliability_val,gaussian_blur,12,231
+MobileNetV3-Small,123,reliability_val,gaussian_noise,3,231
+MobileNetV3-Small,123,reliability_val,original,1,77
+MobileNetV3-Small,2026,reliability_train,brightness,11,918
+MobileNetV3-Small,2026,reliability_train,contrast,13,918
+MobileNetV3-Small,2026,reliability_train,gaussian_blur,35,918
+MobileNetV3-Small,2026,reliability_train,gaussian_noise,12,918
+MobileNetV3-Small,2026,reliability_train,original,3,306
+MobileNetV3-Small,2026,reliability_val,brightness,3,231
+MobileNetV3-Small,2026,reliability_val,contrast,3,231
+MobileNetV3-Small,2026,reliability_val,gaussian_blur,13,231
+MobileNetV3-Small,2026,reliability_val,gaussian_noise,3,231
+MobileNetV3-Small,2026,reliability_val,original,1,77
+DINOv3 ViT-S/16,42,reliability_train,brightness,3,918
+DINOv3 ViT-S/16,42,reliability_train,contrast,3,918
+DINOv3 ViT-S/16,42,reliability_train,gaussian_blur,3,918
+DINOv3 ViT-S/16,42,reliability_train,gaussian_noise,5,918
+DINOv3 ViT-S/16,42,reliability_train,original,1,306
+DINOv3 ViT-S/16,42,reliability_val,brightness,0,231
+DINOv3 ViT-S/16,42,reliability_val,contrast,0,231
+DINOv3 ViT-S/16,42,reliability_val,gaussian_blur,0,231
+DINOv3 ViT-S/16,42,reliability_val,gaussian_noise,0,231
+DINOv3 ViT-S/16,42,reliability_val,original,0,77
+DINOv3 ViT-S/16,123,reliability_train,brightness,2,918
+DINOv3 ViT-S/16,123,reliability_train,contrast,3,918
+DINOv3 ViT-S/16,123,reliability_train,gaussian_blur,3,918
+DINOv3 ViT-S/16,123,reliability_train,gaussian_noise,2,918
+DINOv3 ViT-S/16,123,reliability_train,original,1,306
+DINOv3 ViT-S/16,123,reliability_val,brightness,0,231
+DINOv3 ViT-S/16,123,reliability_val,contrast,0,231
+DINOv3 ViT-S/16,123,reliability_val,gaussian_blur,0,231
+DINOv3 ViT-S/16,123,reliability_val,gaussian_noise,0,231
+DINOv3 ViT-S/16,123,reliability_val,original,0,77
+DINOv3 ViT-S/16,2026,reliability_train,brightness,2,918
+DINOv3 ViT-S/16,2026,reliability_train,contrast,3,918
+DINOv3 ViT-S/16,2026,reliability_train,gaussian_blur,3,918
+DINOv3 ViT-S/16,2026,reliability_train,gaussian_noise,2,918
+DINOv3 ViT-S/16,2026,reliability_train,original,1,306
+DINOv3 ViT-S/16,2026,reliability_val,brightness,0,231
+DINOv3 ViT-S/16,2026,reliability_val,contrast,0,231
+DINOv3 ViT-S/16,2026,reliability_val,gaussian_blur,0,231
+DINOv3 ViT-S/16,2026,reliability_val,gaussian_noise,0,231
+DINOv3 ViT-S/16,2026,reliability_val,original,0,77
