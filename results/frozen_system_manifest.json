@@ -1,0 +1,68 @@
+{
+  "created_utc": "2026-11-24T23:11:07+00:00",
+  "purpose": "Freeze of the DINOv3 system before any S-test, PP2020 or PlantDoc evaluation",
+  "classifier_seeds": [
+    42,
+    123,
+    2026
+  ],
+  "backbone": {
+    "repo": "timm/vit_small_patch16_dinov3.lvd1689m",
+    "revision": "3bf4720a82ec2066db88137180ff1f83a675cef0"
+  },
+  "git": {
+    "commit": "8e7bb90cac3583ccc77dbe3fae0d06b9c3d516ad",
+    "uncommitted_file_count": 0
+  },
+  "libraries": {
+    "python": "3.11.9",
+    "torch": "2.11.0+cu128",
+    "torchvision": "0.26.0+cu128",
+    "timm": "1.0.31",
+    "numpy": "2.4.6",
+    "pandas": "2.3.3",
+    "sklearn": "1.9.1",
+    "PIL": "12.3.0"
+  },
+  "files": {
+    "frozen:splits/split_assignments.csv": "d59a80cce32c84ed32d9fc6ef5c5d870082933cc8892c757184d16d4052a6401",
+    "frozen:manifests/manifest.csv": "d0aabb245d6993e840d43ab2cad4f798a3d3360825a7b53e8a69c420b7268b73",
+    "backbone:model.safetensors": "2a1ec16ae28ffa07bc0ead0241ee7df9fc26451fe6f9f839b7b3afa0a906b040",
+    "results/frozen_calibration_settings.json": "f0af06ad4915ed6c2b661a87ad81bffd73232f5b45146c0893d7a48c10eda7e0",
+    "results/temperature_scaling.csv": "b2c4b697a8565e139bfabab5036854b511cb33b106a820bc33cf81dc5dc989bc",
+    "results/calibration_thresholds.csv": "0e29066bafe8959797e8e3e4918324d2db3b9063ef6a5e60aa259f7b93de198c",
+    "results/source_alarm_thresholds.csv": "8c0432362cf902c1a58f46df84db64d16c535b0fc7660e599eab881074f2fb45",
+    "models/dino_seed42_phaseB.pt": "d078c79a35220c72b231465a5ce317666fae3361a0019960a280cc6874a4ca14",
+    "models/failure_head_proposed_seed42.pt": "82dfee08ac99f2f3845fbd2eccb70fcf6f5ac8561354169b55cf23bbbe264f94",
+    "models/failure_head_logits_only_seed42.pt": "502ba93db1e39f14905eeb3fa30f23f34072716d0ced537d08461b5151a369d8",
+    "models/failure_head_features_only_seed42.pt": "d45900b9ffda96fcfbb4105a212ccf3e5fd379d24e6875e2cb4c27d89cc75d37",
+    "results/s_calibration_outputs_seed42.csv": "ee85b148a43308fcec8511a8f11fff01954e0129565167db5bea322ddb68fb18",
+    "models/dino_seed123_phaseB.pt": "d2ab865a2244336beca0ff96d3dfeacaf53543c66b971530046453a8906faf1a",
+    "models/failure_head_proposed_seed123.pt": "9a763a988d6a07693e3409c07f066620e68c3ea0cc75c936e301d2a9b709c3c5",
+    "models/failure_head_logits_only_seed123.pt": "68f12d75d2a911317778662c84ecea79cbc5ab48a21b5fe88b01d3e6ae7eff97",
+    "models/failure_head_features_only_seed123.pt": "aef8b1d1c40336512f7137860e05d2b3e6874171c4ad06957d271c382ce9460f",
+    "results/s_calibration_outputs_seed123.csv": "0e3b1f449429aa6fe71939337127cefe7cc1cc43fbbaec157666ae6fd322ceb0",
+    "models/dino_seed2026_phaseB.pt": "af66a469cd9fa135181b21cdc4b4761379572fd738925709994fe2728a1565c5",
+    "models/failure_head_proposed_seed2026.pt": "1c5547ff290d63253040bf349d3aa9867cc5a1e3bdb0ca7d219b9a9d49a43dc5",
+    "models/failure_head_logits_only_seed2026.pt": "b5045ebe9c9ce8f29545fd24b246297e719b15610a8334a72cc2130b3d9debcf",
+    "models/failure_head_features_only_seed2026.pt": "673367d09e56b0e718d4b56918f48c5f31e638c06fc70d776f86261e9e2d3e6a",
+    "results/s_calibration_outputs_seed2026.csv": "4c7f35c756cbc41f629d49b9507eeaa35f0904ca38bdab8451084756918eea11",
+    "src/common.py": "92e19c15c746a15267d05faf40b2de740911a2af6dc91add25b7c50afffa439f",
+    "src/train_classifier.py": "38f57d4d79a40b4fa84fb51c78c78368873dc02de82530b30cab4a64f5650163",
+    "src/prepare_reliability_views.py": "b64f93f198867f4188e43131e1ad8d17dd787bf136f536ed57fb0b2c9524a048",
+    "src/train_failure_heads.py": "182fcc92776063fa972c57ce829fc8b6b557d343605389e1cc9f0191173ba416",
+    "src/calibrate.py": "b1b47411906e63888ca8c4e491d323c1bbbe670e7852bbd4d9e08b917d4dacf5",
+    "src/source_alarm_thresholds.py": "ab8a688475c8240d86a12dabc6c9c5e9428770da0e4d204820107ba9f5ed738a",
+    "src/freeze.py": "b85b5d7b9ea5f65002db13be9d15c591d2c948d4e56425270ab5f867744940d1",
+    "frozen:src/config.py": "cd1a439e579bca6272fbd03c5d3a5d750a94f1e8f42e34a9b4552da61e16b942",
+    "frozen:src/dataset.py": "4c0c5172b60b376ec2f63e95ace5bba07775a08a583e09ac69e9e56b0d761bf7",
+    "frozen:src/train_classifier.py": "f4660f63f120190117780ad7d35a14f1d6c4769dd37dc4846d8ec49d36a9dc67",
+    "frozen:src/prepare_reliability_data_v2.py": "5b4f2cb396ed7b159d831dbd38a2ac641c80e621f54abecffa3fa91eca9c52d1",
+    "frozen:src/failure_head_diagnostic.py": "b90bf81f5e7c8727b5dc0712b2d3aa8ded9d7b98426dbe3584749af36bf3222a",
+    "frozen:src/train_failure_head.py": "667fedc82463d23de08dc6fb1b66cd743dc0597db9a987412e77a896f7b1521d",
+    "frozen:src/retrain_failure_head.py": "3156c764591a0e67491268a2758f25c37b356128088fe74edf8a0a7890d04e7e",
+    "frozen:src/calibrate_and_thresholds.py": "a59d30d7125fe57a3ad3403d66ff8f6a96a3de3f9bde114dcd88dde41cbd805c",
+    "frozen:src/frozen_pipeline.py": "c3e6cbc9e9cb72ad55766066ef73f75eefe6fab42e4263439d38f57e0c6ea3f3",
+    "frozen:src/metrics.py": "1a87f193f04426d27f708e1fddf670eafbdac63110f151ce3ce3b1f552cec00e"
+  }
+}
