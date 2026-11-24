@@ -21,6 +21,18 @@ Do the original findings hold for a self-supervised vision foundation model?
   4. the 4 GB fit test of section 4 fails even with the memory rules.
 - The backbone actually used is recorded with its exact model revision (commit hash) and the SHA-256 of its weight file.
 
+### Amendment 1 (2026-11-25, before any access, load or fit test)
+
+- **Source of the DINOv3 weights:** the official weights redistributed ungated by the `timm` library: `timm/vit_small_patch16_dinov3.lvd1689m` (DINOv3 licence included with the files). They are loaded with `timm` instead of `transformers`. The gated `facebook/` repository is no longer needed.
+- **Reason:** immediate access. The DINOv3 licence permits redistribution with the licence attached. Publication requires acknowledging DINOv3, which will be done.
+- **Faithfulness to the original model:**
+  - `timm` omits the QKV biases, which are all zero in the original model, so the outputs are identical.
+  - `timm` keeps the RoPE periods in float32. They are truncated to bfloat16 after loading, as the model card describes, so that the outputs match the original model.
+- **Feature:** the CLS token (index 0, before the 4 register tokens and the patch tokens) of `forward_features`, which is after the final norm. This is the same quantity as `pooler_output` in section 3.
+- **Phase B:** `model.blocks[-3:]` are trainable. Every LayerNorm (including `model.norm`) stays frozen.
+- The fallback rule of section 2 is unchanged. Condition 1 (access not granted) can no longer apply; conditions 3 and 4 still apply. For the fallback, DINOv2-small would also be taken from `timm` or `transformers`, whichever loads it.
+- The `timm` version is recorded in the environment file.
+
 ## 3. Recipe mapping (identical to the original unless stated)
 
 | Item | Original (MobileNetV3-Small) | This study |
