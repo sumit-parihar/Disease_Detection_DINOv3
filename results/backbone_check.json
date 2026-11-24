@@ -1,0 +1,25 @@
+{
+  "repo": "timm/vit_small_patch16_dinov3.lvd1689m",
+  "revision": "3bf4720a82ec2066db88137180ff1f83a675cef0",
+  "weights_file": "model.safetensors",
+  "weights_sha256": "2a1ec16ae28ffa07bc0ead0241ee7df9fc26451fe6f9f839b7b3afa0a906b040",
+  "licence_sha256": "25d122eb8f5b880fd23c736fb6ea8018ee45c12237e00b8a86d14c653904999e",
+  "timm_version": "1.0.31",
+  "torch_version": "2.11.0+cu128",
+  "gpu": "NVIDIA GeForce RTX 3050 Laptop GPU",
+  "rope_periods_truncated_to_bf16": true,
+  "num_blocks": 12,
+  "feature_dim": 384,
+  "token_shape_at_224": [
+    2,
+    201,
+    384
+  ],
+  "num_prefix_tokens": 5,
+  "params_total": 21588099,
+  "params_trainable_phase_b": 5318787,
+  "params_trainable_phase_a": 1155,
+  "fit_test_mode": "fp32",
+  "peak_gpu_memory_gib": 0.723,
+  "fit_test_passed": true
+}
