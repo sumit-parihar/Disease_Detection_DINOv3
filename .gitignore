@@ -1,0 +1,16 @@
+venv/
+data/
+models/
+hf_cache/
+*.pt
+*.npz
+*.npy
+*.safetensors
+__pycache__/
+*.py[cod]
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
+.env
