@@ -26,7 +26,7 @@ HEAD_VARIANTS = ("proposed", "logits_only", "features_only")
 METHODS = ["B1 MSP", "B2 Entropy", "B3 Margin", "B4 Temp-scaled MSP", "B5 Logits-only head",
            "A1 Features-only head", "P1 Proposed head"]
 OWN_CODE = ["common.py", "train_classifier.py", "prepare_reliability_views.py", "train_failure_heads.py",
-            "calibrate.py", "freeze.py"]
+            "calibrate.py", "source_alarm_thresholds.py", "freeze.py"]
 FROZEN_CODE = ["config.py", "dataset.py", "train_classifier.py", "prepare_reliability_data_v2.py",
                "failure_head_diagnostic.py", "train_failure_head.py", "retrain_failure_head.py",
                "calibrate_and_thresholds.py", "frozen_pipeline.py", "metrics.py"]
@@ -45,7 +45,8 @@ def files():
     out = {"frozen:splits/split_assignments.csv": FROZEN_ROOT / "splits" / "split_assignments.csv",
            "frozen:manifests/manifest.csv": FROZEN_ROOT / "manifests" / "manifest.csv",
            "backbone:model.safetensors": weights_path()}
-    for name in ("frozen_calibration_settings.json", "temperature_scaling.csv", "calibration_thresholds.csv"):
+    for name in ("frozen_calibration_settings.json", "temperature_scaling.csv", "calibration_thresholds.csv",
+                 "source_alarm_thresholds.csv"):
         out[f"results/{name}"] = RESULTS_DIR / name
     for seed in SEEDS:
         out[f"models/dino_seed{seed}_phaseB.pt"] = MODELS_DIR / f"dino_seed{seed}_phaseB.pt"
